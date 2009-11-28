@@ -5,5 +5,5 @@ import cn.orz.pascal.gae.framework.Global
 import scala.collection.mutable.HashMap
 
 object RouteTable {
-	val routes = new HashMap[(Symbol, String), (Request, Response, Global) => scala.xml.Elem]	
+   val routes = new HashMap[(Symbol, String), (Request, Response, Global) => scala.xml.Elem] 
 }

@@ -6,31 +6,31 @@ import cn.orz.pascal.gae.framework.AbstractRoute
 import cn.orz.pascal.gae.framework.Global
 
 object Application extends AbstractRoute{
-	case class Entry(body:String)
+   case class Entry(body:String)
    def template(body:scala.xml.NodeBuffer) = {
-  		<html lang="ja">
-	    <head>
-	    	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	    	<title>ブログなんだよもん</title>
-	    </head>
-	    <body>{body}</body>
-		</html>
+      <html lang="ja">
+          <head>
+             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+             <title>ブログなんだよもん</title>
+          </head>
+          <body>{body}</body>
+      </html>
    
    }
 
-	get("/"){(req, res, $) =>  $.forward( "/index.html" )}
-	get("/favicon.ico"){(req, res, $) =>  <icon />}
+   get("/"){(req, res, $) =>  $.forward( "/index.html" )}
+   get("/favicon.ico"){(req, res, $) =>  <icon />}
 
-	get("/index.html"){ (req, res, $) =>
-		val params = req.params
+   get("/index.html"){ (req, res, $) =>
+      val params = req.params
       val entries = DataStore from ('entry) asList()
       template(
-		    <h1>ブログなんだよもん</h1>
-		    <p>
+         <h1>ブログなんだよもん</h1>
+         <p>
             <a href="new.html">投稿</a>
-		    </p>
+         </p>
 
-          <div>
+         <div>
             {for(entry <- entries) yield {
             <div>
                <h2>{entry('title)}</h2>
@@ -38,14 +38,14 @@ object Application extends AbstractRoute{
                <p>{entry('contents)}</p>
             </div> 
             }}
-          </div>
+         </div>
       )
     
    }
 
    get("/new.html"){(req, res, $) =>
       template(
-		    <h1>ブログなんだよもん - 投稿</h1>
+          <h1>ブログなんだよもん - 投稿</h1>
           <form method="post" action="entry">
             <fieldset>
                <legend>ここに入力</legend>
@@ -75,12 +75,12 @@ object Application extends AbstractRoute{
        )
    }
 
-	post("/entry"){(req, res, $) =>
-		val params = req.params
-		DataStore.put(Entity('entry ,('title, params("title")),
+   post("/entry"){(req, res, $) =>
+      val params = req.params
+      DataStore.put(Entity('entry ,('title, params("title")),
                                   ('contents, params("contents")),
                                   ('date, (new java.util.Date()).toString)))
-		$.redirect( "/index.html" )
-	}
+      $.redirect( "/index.html" )
+   }
  
 }
