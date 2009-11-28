@@ -1,0 +1,16 @@
+= Scala on GAE
+
+== DESCRIPTION:
+
+Google App EngineでScalaを動かす時のQuickStart.
+まだ開発中のため仕様は随時変更される.
+
+== 構成
+* shinatoraを参考にした軽量Webフレームワーク.
+* ScalaからBigTableを操作するための永続化フレームワーク.
+
+== Serverの起動
+ant runserver
+
+== GAEにアップロード
+$APPENGINE_SDK/bin/appcfg.sh update war
