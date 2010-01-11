@@ -2,8 +2,7 @@ package cn.orz.pascal.muse3
 
 import cn.orz.pascal.gae.persist.DataStore._
 import cn.orz.pascal.gae.persist._
-import cn.orz.pascal.gae.framework.AbstractRoute
-import cn.orz.pascal.gae.framework.Global
+import cn.orz.pascal.gae.framework.{AbstractRoute, Environment}
 
 object Application extends AbstractRoute{
    case class Entry(body:String)
@@ -15,14 +14,13 @@ object Application extends AbstractRoute{
           </head>
           <body>{body}</body>
       </html>
-   
    }
 
-   get("/"){(req, res, $) =>  $.forward( "/index.html" )}
-   get("/favicon.ico"){(req, res, $) =>  <icon />}
+   get("/"){(env) =>  env.forward( "/index.html" )}
+   get("/favicon.ico"){env =>  <icon />}
 
-   get("/index.html"){ (req, res, $) =>
-      val params = req.params
+   get("/index.html"){env =>
+      import env._
       val entries = DataStore from ('entry) asList()
       template(
          <h1>ブログなんだよもん</h1>
@@ -40,13 +38,24 @@ object Application extends AbstractRoute{
             }}
          </div>
       )
-    
    }
 
-   get("/new.html"){(req, res, $) =>
+   get("/${user}/${id}.html"){env =>
+      import env._
+      template(
+         <h1>ブログなんだよもん</h1>
+         <p>
+            <a href="new.html">投稿</a>
+         </p>
+         <p>name :{params("user")}</p>
+         <p>id :{params("id")}</p>
+      )
+   }
+
+   get("/new.html"){env =>
       template(
           <h1>ブログなんだよもん - 投稿</h1>
-          <form method="post" action="entry">
+          <form method="post" action="create">
             <fieldset>
                <legend>ここに入力</legend>
                <p>
@@ -75,12 +84,12 @@ object Application extends AbstractRoute{
        )
    }
 
-   post("/entry"){(req, res, $) =>
-      val params = req.params
-      DataStore.put(Entity('entry ,('title, params("title")),
-                                  ('contents, params("contents")),
+   post("/create"){(env) =>
+      import env._
+      DataStore.put(Entity('entry ,('title, request.params("title")),
+                                  ('contents, request.params("contents")),
                                   ('date, (new java.util.Date()).toString)))
-      $.redirect( "/index.html" )
+      env.redirect( "/index.html" )
    }
  
 }

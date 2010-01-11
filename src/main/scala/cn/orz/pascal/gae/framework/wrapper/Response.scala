@@ -4,8 +4,8 @@ import javax.servlet.http.{HttpServletResponse ,HttpServletRequest}
 import javax.servlet.http.Cookie
 import java.util.Locale
 
-class Response(val res:HttpServletResponse){
-   def response:HttpServletResponse = res
+class Response(res:HttpServletResponse){
+   def src:HttpServletResponse = res
     
    // ServletResponse
    def characterEncoding = res.getCharacterEncoding()

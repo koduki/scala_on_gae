@@ -4,8 +4,8 @@ import scala.collection.mutable.Map
 import scala.collection.jcl.Conversions._
 import com.google.appengine.api.datastore._
 
-class Request(val req:HttpServletRequest){
-   def request:HttpServletRequest = req
+class Request(req:HttpServletRequest){
+   def src:HttpServletRequest = req
 
    // ServletRequest
    def attribute(name:String) = req.getAttribute(name)
@@ -21,15 +21,6 @@ class Request(val req:HttpServletRequest){
       val src = req.getParameterMap
       def apply(key:String):String = if (src.containsKey(key))   (src.get(key)).asInstanceOf[Array[String]](0)   else ""
    }
-   /*
-   def params = new {
-      val src = req.getParameterMap
-      def apply(key:String) = (src.get(key)).asInstanceOf[Array[Any]](0) match{
-         case x:Text => x.getValue
-         case x:String => java.net.URLDecoder.decode(x, "UTF-8")
-      }
-   }
-*/
    def protocol = req.getProtocol()
    def remoteAddr = req.getRemoteAddr()
    def remoteHost = req.getRemoteHost()
