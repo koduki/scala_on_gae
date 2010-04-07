@@ -7,15 +7,16 @@ object DataStore {
      properties.foreach(x => result += x)
      result
    }
+   
 	def Entity(kind:Symbol) = new EntityWrapper(new Entity(kind.toString))
-	def Entity(kind:String) = new EntityWrapper(new Entity(kind))
 	def Entity(kind:Symbol, parent:Key) = new EntityWrapper(new Entity(kind.toString, parent))  
-	def Entity(kind:String, parent:Key) = new EntityWrapper(new Entity(kind, parent))  
+	def Key(kind:Symbol, key:String) = KeyFactory.createKey(kind.toString, key.toLong)
+
 	class EntityWrapper(val src:Entity){
 		def key() = src.getKey
 		def parent() = src.getParent
-		def put(keyName:Symbol, value:Any):EntityWrapper = {src.setProperty(keyName.toString, value);this}
-	   def +=(keyName:Symbol, value:Any):EntityWrapper = put(keyName, value)
+		def put(keyName:Symbol, value:Any):EntityWrapper = {src.setProperty(keyName.toString(), value.toString());this}
+	   def +=(keyName:Symbol, value:Any):EntityWrapper = put(keyName, value.toString())
 	   def +=(args:(Symbol, Any)*):EntityWrapper = {args.foreach(x => this.put(x._1, x._2)); this}
 	   def apply(keyName:Symbol) =  src.getProperty(keyName.toString) match{
 			case x:Text => x.getValue
@@ -45,9 +46,13 @@ object DataStore {
 
     val ds = DatastoreServiceFactory.getDatastoreService()
     class Filter(ds:DatastoreService, query:Query){ 
+      def sortDesc(target:Symbol) = new FetchOption(ds, query.addSort(target.toString, Query.SortDirection.DESCENDING))
       def asIterator():Iterator[EntityWrapper] = ds.prepare(query).asIterable()
       def asList():List[EntityWrapper] = asIterator.toList      
       def where(predicate:Query => Query) = new FetchOption(ds, predicate(query))
+    	def limit(offset:Int, limit:Int) = new {
+    	  def asIterator():Iterator[EntityWrapper] = ds.prepare(query).asIterable(FetchOptions.Builder.withLimit(limit).offset(offset)) 
+    	} 
     }
     
 	class FetchOption(ds:DatastoreService, query:Query){ 
@@ -63,7 +68,6 @@ object DataStore {
  	def from(kind:Symbol, ancestor:Key) = new Filter(ds, new Query(kind.toString, ancestor))    
 
 	def put(x:EntityWrapper) = DatastoreServiceFactory.getDatastoreService.put(x.src)
+	def get(kind:Symbol, key:String) = new EntityWrapper(DatastoreServiceFactory.getDatastoreService.get(Key(kind, key) ))
 	def get(key:Key) = new EntityWrapper(DatastoreServiceFactory.getDatastoreService.get(key))
-	def get(kind:Symbol, key:Symbol, value:Any) = (DataStore from(kind) where(key === value) asList())(0)
-	def exist(kind:Symbol, key:Symbol, value:Any) = !(DataStore from(kind) where(key === value) asList() isEmpty)
 }

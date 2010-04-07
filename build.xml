@@ -4,6 +4,7 @@
   <property name="scala.home" location="/usr/share/scala" />
   <property name="scala.bin" location="/usr/bin" />
   <property name="sources.dir" value="src/main/scala" />
+  <property name="specs.dir" value="src/spec/scala" />
   <property name="resources.dir" value="src/main/resources" />
   <property name="webapp.dir" value="src/main/webapp"/>
 
@@ -15,7 +16,10 @@
       <include name="**/*.jar" />
     </fileset>
     <fileset dir="${sdk.dir}/lib">
+            <!--            h
       <include name="shared/**/*.jar" />
+      -->
+      <include name="*.jar" />
     </fileset>
   </path>
 
@@ -28,14 +32,14 @@
     </path>
     <taskdef resource="scala/tools/ant/antlib.xml">
       <classpath>
+        <pathelement location="${scala.home}/lib/specs-1.6.1.jar"   />
         <pathelement location="${scala.home}/lib/scala-compiler.jar"   />
         <pathelement location="${scala-library.jar}"   />
       </classpath>
     </taskdef>
   </target>
   
-  
-    <target name="copyscala"
+  <target name="copyscala"
       description="Copies the App Engine JARs to the WAR.">
     <copy
         todir="${webapp.dir}/WEB-INF/lib"
@@ -76,6 +80,32 @@
          />
   </target>
   
+  <target name="buildspecs" depends="compile"
+      description="build Scala Spec.">
+
+    <copy todir="${webapp.dir}/WEB-INF/classes">
+      <fileset dir="${specs.dir}">
+        <exclude name="**/*.scala" />
+      </fileset>
+    </copy>
+ 
+    <fsc
+        srcdir="${specs.dir}"
+		  encoding="utf8"
+        destdir="${webapp.dir}/WEB-INF/classes"
+        classpathref="project.classpath"
+         />
+  </target>
+
+  <target name="runspecs" depends="buildspecs"
+      description="Running Scala Spec.">
+
+      <java classname="cn.orz.pascal.gae.framework.helloWorld"
+            classpathref="project.classpath"
+            >
+      </java>
+  </target>
+
   <target name="runserver" depends="compile"
       description="Starts the development server.">
     <dev_appserver war="${webapp.dir}" />

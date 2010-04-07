@@ -8,6 +8,7 @@ Google App EngineでScalaを動かす時のQuickStart.
 == 構成
 * shinatoraを参考にした軽量Webフレームワーク.
 * ScalaからBigTableを操作するための永続化フレームワーク.
+* サンプルのブログアプリ.
 
 == Serverの起動
 ant runserver

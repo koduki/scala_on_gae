@@ -9,6 +9,7 @@ class Request(req:HttpServletRequest){
 
    // ServletRequest
    def attribute(name:String) = req.getAttribute(name)
+   def attribute(name:String, value:Any)= req.setAttribute(name, value)
    def attributeNames() = req.getAttributeNames
    def characterEncoding = req.getCharacterEncoding()
    def contentLength = req.getContentLength()
