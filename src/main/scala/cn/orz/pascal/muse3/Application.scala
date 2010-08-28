@@ -2,142 +2,121 @@ package cn.orz.pascal.muse3
 
 import cn.orz.pascal.gae.persist.DataStore._
 import cn.orz.pascal.gae.persist._
-import cn.orz.pascal.gae.framework.{AbstractRoute, Environment}
+import cn.orz.pascal.gae.framework.{AbstractApplication, Environment}
 import cn.orz.pascal.gae.framework.helper.HtmlHelper._
+import cn.orz.pascal.gae.framework.util.DateUtils
+import com.google.appengine.api.datastore.Text
+import java.util.Date
 
-object Application extends AbstractRoute{
-   case class Entry(body:String)
-   def template(body:scala.xml.NodeBuffer) = {
-      <html lang="ja">
-          <head>
-             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-             <title>ブログなんだよもん</title>
-          </head>
-          <body>{body}</body>
-      </html>
-   }
-
+object Application extends AbstractApplication{
    get("/favicon.ico"){env =>  <icon />}
-   get("/"){(env) =>  env.forward( "/index.html" )}
-   get("/index.html"){env =>
+   get("/"){(env) =>  env.redirect( "/muse/pascal/" )}
+   get("/index.html"){(env) =>  env.redirect( "/muse/pascal/" )}
+   get("/muse/pascal/"){(env) =>  env.forward( "/muse/pascal/index.html" )}
+   get("/muse/pascal/view.html"){(env) =>  env.redirect( "/muse/pascal/" )}
+   get("/muse/pascal/index.html"){env =>
       import env._
       val offset = if (params.contains("offset")) params("offset").toInt else 0
-      val entries = DataStore from ('entry) sortDesc('created_at) limit(offset, 20) asIterator
+      val entries = DataStore from ('entry) sortDesc('created_at) limit(offset, 10) asIterator
 
-      template(
-         <h1>ブログなんだよもん</h1>
-         <p>
-            <a href="edit.html">投稿</a>
-         </p>
-         <p>
-           
-           </p>
-         <div>
-            {for(entry <- entries) yield {
-            <div>
-               <h2>{$("<a href='/" + entry.key.getId +  ".html'>" + entry('title) + "</a>")}</h2>
-               <p>{entry('date)}</p>
-               <p>{html(entry('contents).toString)}</p>
-            </div> 
-            }}
-         </div>
-         <p>
-           {$("<a href='index.html?offset=" + (if (offset > 10) (offset - 10) else 0)  +"'>前へ</a>")}
-           {$("<a href='index.html?offset=" + (offset + 10)  +"'>次へ</a>")}
-         </p>
-      )
+      Index(offset, entries)
    }
 
-   get("/${id}.html"){env =>
+   get("/muse/pascal/${id}.html"){env =>
       import env._
-      val entry = DataStore get('entry, params("id"))
+      val id = params("id")
+      val entry = DataStore get('entry, id)
       val comments = DataStore from ('comment, entry.key) asList()
-      template(
-         <h1>ブログなんだよもん</h1>
-         <p>
-         </p>
-         <p>id :{params("id")}</p>
-         <p>{entry('title)}</p>
-         <p>{entry('contents)}</p>
-         <p>{entry('date)}</p>
-         <div>
-            <ul>
-            {for(comment <- comments) yield {
-              <li><span>{comment('name)}</span> : <span>{comment('body)}</span></li>
-            }}
-            </ul>
-         </div> 
- 
-         <span>{$("<a href='/edit.html?id=" + params("id") + "'>編集</a>")}</span>
-         <form method="post" action="/comment/create.do">
-           {$("<input type='hidden' name='parent' value='" + params("id") + "' />")}
-           <input name="name"/> : <input name="body"/> <input type="submit"/>
-         </form>
-      )
+
+      Show(id, entry, comments)
    }
 
-   get("/edit.html"){env =>
+   get("/muse/pascal/edit.html"){env =>
       import env._
       val entry = if(params.contains("id")){
                      val id = params("id")
-                     request.session.setAttribute("id", id)
+                     flash("id", id)
 
                      DataStore get('entry, id)
                   }else{
                      Entity('entry ,('title, ""),
                                     ('contents, ""),
-                                    ('date, (new java.util.Date()).toString))
+                                    ('date, DateUtils.format(new Date())))
                   }
-      template(
-          <h1>ブログなんだよもん - 編集</h1>
-          <form method="post" action="/entry/create.do">
+      Template("edit"){
+          <form method="post" action="/muse/pascal/entry/create.do">
             <fieldset>
                <legend>ここに入力</legend>
                <p>{$("<input name='title' value='" +  entry('title) + "' />")}</p>
                <div>内容:</div>
-               <textarea id="contents" name="contents">{entry('contents)}</textarea>
+               <textarea class="ckeditor" name="contents">{entry('contents)}</textarea>
             </fieldset>
             <input type="submit" value="書き込む"/>
          </form>
-       )
+      }
    }
 
-   get("/logout"){(env) =>
+   get("/muse/pascal/delete.html"){env =>
+      import env._
+      val id = params("id")
+      flash("id", id)
+
+      Template("delete"){
+         <p> 
+            <h2>本当に削除しますか？</h2>
+            <form method="post" action="/muse/pascal/entry/delete.do">
+               <input type="submit" value="OK"/>
+            </form>
+         </p>
+      }
+   }
+
+   get("/muse/pascal/logout.html"){(env) =>
       import com.google.appengine.api.users.UserServiceFactory
       val userService = UserServiceFactory.getUserService
-      template(
-         <h2>logout</h2>
-         <span>{$("<a href='" +  userService.createLogoutURL("/") + "'>ログアウト</a>")}</span>
+      Template("logout")(
+         <p>
+           <h2>logout</h2>
+           <span>{$("<a href='" +  userService.createLogoutURL("/") + "'>ログアウト</a>")}</span>
+         </p>
       )
    }
 
-   post("/entry/create.do"){(env) =>
+   post("/muse/pascal/entry/create.do"){(env) =>
       import env._
-      println("iddd;" + request.attribute("id") )
-      val entry = if(request.session.getAttribute("id") != null){
-                     val id = request.session.getAttribute("id").toString
-                     DataStore get('entry, id)
+      val id = flash("id")
+      val entry = if(id != null){
+                     DataStore get('entry, id.toString)
                   }else{
                      Entity('entry,('title, ""),
                                    ('contents, ""),
-                                   ('created_at, (new java.util.Date()).toString))
+                                   ('created_at, DateUtils.format(new Date())))
                   }
-
       entry.put('title, request.params("title"))
-      entry.put('contents, request.params("contents"))
+      entry.put('contents, new Text(request.params("contents")))
+      entry.put('updated_at, DateUtils.format(new Date()))
 
       DataStore.put(entry)
-      redirect( "/index.html" )
+      redirect( "/muse/pascal/index.html" )
    }
 
-   post("/comment/create.do"){(env) =>
+   post("/muse/pascal/entry/delete.do"){(env) =>
+      import env._
+      val id = flash("id").toString
+      DataStore.delete('entry, id)
+
+      redirect( "/muse/pascal/index.html" )
+   }
+
+
+   post("/muse/pascal/comment/create.do"){(env) =>
       import env._
       val parent = Key('entry, request.params("parent"))
       val comment = Entity('comment ,parent)  += (
                               ('name, request.params("name")), 
                               ('body, request.params("body")), 
-                              ('created_at, (new java.util.Date()).toString))
+                              ('created_at, DateUtils.format(new Date())))
       DataStore.put(comment)
-      redirect( "/" + request.params("parent") + ".html" )
+      redirect( "/muse/pascal/" + request.params("parent") + ".html" )
    }
 }

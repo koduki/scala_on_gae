@@ -1,5 +1,6 @@
 package cn.orz.pascal.gae.persist
 import com.google.appengine.api.datastore._
+import com.google.appengine.api.datastore.Text 
 
 object DataStore {
 	def Entity(kind:Symbol, properties:(Symbol, Any)*) = {
@@ -15,10 +16,10 @@ object DataStore {
 	class EntityWrapper(val src:Entity){
 		def key() = src.getKey
 		def parent() = src.getParent
-		def put(keyName:Symbol, value:Any):EntityWrapper = {src.setProperty(keyName.toString(), value.toString());this}
+		def put(keyName:Symbol, value:Any):EntityWrapper = {src.setProperty(keyName.toString(), value);this}
 	   def +=(keyName:Symbol, value:Any):EntityWrapper = put(keyName, value.toString())
 	   def +=(args:(Symbol, Any)*):EntityWrapper = {args.foreach(x => this.put(x._1, x._2)); this}
-	   def apply(keyName:Symbol) =  src.getProperty(keyName.toString) match{
+	   def apply(keyName:Symbol):String =  src.getProperty(keyName.toString) match{
 			case x:Text => x.getValue
 			case x:String => x
 			case _ => ""
@@ -68,6 +69,8 @@ object DataStore {
  	def from(kind:Symbol, ancestor:Key) = new Filter(ds, new Query(kind.toString, ancestor))    
 
 	def put(x:EntityWrapper) = DatastoreServiceFactory.getDatastoreService.put(x.src)
-	def get(kind:Symbol, key:String) = new EntityWrapper(DatastoreServiceFactory.getDatastoreService.get(Key(kind, key) ))
-	def get(key:Key) = new EntityWrapper(DatastoreServiceFactory.getDatastoreService.get(key))
+	def get(kind:Symbol, key:String):EntityWrapper = get(Key(kind, key))
+	def get(key:Key):EntityWrapper = new EntityWrapper(DatastoreServiceFactory.getDatastoreService.get(key))
+	def delete(kind:Symbol, key:String):Unit = delete(Key(kind, key))
+	def delete(key:Key):Unit = DatastoreServiceFactory.getDatastoreService.delete(key)
 }

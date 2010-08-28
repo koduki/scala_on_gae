@@ -35,25 +35,19 @@ object RoutingManager{
          foldLeft(Map[String, String]()){(r, x) => r + x}
    }
 
-   def count_matches(url1:String)(url2:String):Double = {
-      val eq2 = (x:String, y:String) => 
-            (x != "" && y != "" ) &&
-            (x == y)
-      
-      val like = (x:String, y:String) => 
-            (x != "" && y != "" ) &&
-            (y.matches(""".*\$\{.+?\}.*"""))
-
+   def count_matches(url1:String)(url2:String):Int = {
+      val eq2 = (x:String, y:String) => (x == y)
+      val like = (x:String, y:String) => {
+         val regx = y.replaceFirst(""".*\$\{.+?\}""", "(.*?)")
+         x.matches(regx)
+      }
  
       val xs = url1.split("/").zip(url2.split("/"))
-      if(url1 == "/" && url2 == "/"){
-         1
-      }else{
-         xs.foldLeft(0.0){(r:Double, x:(String, String)) => 
-            r + (if (eq2(x._1, x._2)) 1.0 
-                 else if(like(x._1, x._2)) 0.01
-                 else 0.0)
-         }
+      xs.foldLeft(0){(r:Int, x:(String, String)) => 
+         r + (if (x._1 == "" && x._2 == "" ) 0
+              else if (eq2(x._1, x._2)) 100
+              else if (like(x._1, x._2)) 1 
+              else {return 0})
       }
    }
 
@@ -62,7 +56,16 @@ object RoutingManager{
       val routes = table.keys.toList.filter(x => x._1 == method).map(x => x._2)
 log.info("routings = " + routes.toString)
 
-      val route = routes.sort((x, y) => count(x) > count(y)).head 
+      val route = if(routes.contains(url)){
+         url
+      }else{
+        if(routes.map(x => count(x)).foldLeft(0){(r, x) => r + x} != 0){
+           routes.sort((x, y) => count(x) > count(y)).head
+         }else{ 
+           "not found this page"
+         }
+      }
+      
       val params = mapping(route, url)
 
       (table(method, route), params)

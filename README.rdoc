@@ -14,4 +14,4 @@ Google App EngineでScalaを動かす時のQuickStart.
 ant runserver
 
 == GAEにアップロード
-$APPENGINE_SDK/bin/appcfg.sh update war
+$APPENGINE_SDK/bin/appcfg.sh update src/main/webapp/

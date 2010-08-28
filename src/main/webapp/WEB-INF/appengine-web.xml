@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-	<application>pascalm3</application>
-	<version>2</version>
+	<application>blognandayomon</application>
+	<version>1</version>
   
 	<!-- Configure java.util.logging -->
 	<system-properties>
 		<property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
 	</system-properties>
    <sessions-enabled>true</sessions-enabled>
-	<static-files><exclude path="/**" /></static-files> 
+   <static-files>
+       <include path="/css/**.css"/>
+       <include path="/javascripts/**.js"/>
+       <include path="/javascripts/ckeditor/**.js"/>
+       <include path="/javascripts/ckeditor/**.css"/>
+       <include path="/javascripts/ckeditor/skins/kama/**.css"/>
+       <include path="/javascripts/ckeditor/skins/kama/**.js"/>
+       <include path="/javascripts/ckeditor/skins/kama/**.png"/>
+       <include path="/images/**.png" />
+       <include path="/images/**.jpg" />
+   </static-files>
 </appengine-web-app>

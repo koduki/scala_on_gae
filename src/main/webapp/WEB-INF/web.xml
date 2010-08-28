@@ -6,8 +6,8 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
   <security-constraint>
     <web-resource-collection>
-      <url-pattern>/edit.html</url-pattern>
-      <url-pattern>/entry/*</url-pattern>
+      <url-pattern>/muse/pascal/edit.html</url-pattern>
+      <url-pattern>/muse/pascal/entry/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
       <role-name>admin</role-name>
@@ -21,7 +21,11 @@
 
   <servlet-mapping>
     <servlet-name>routing</servlet-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>routing</servlet-name>
+    <url-pattern>*.html</url-pattern>
   </servlet-mapping>
 
   <servlet>
@@ -29,5 +33,4 @@
     <servlet-class>cn.orz.pascal.gae.framework.InitServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
-
 </web-app>

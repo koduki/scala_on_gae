@@ -14,6 +14,15 @@ class Environment(_req:Request, _res:Response,
    def response() = _res
    def params = pms
 
+   def flash(name:String, value:Any):Unit = {
+      _req.session.setAttribute(name, value)
+   }
+   def flash(name:String):Any = {
+      val result = _req.session.getAttribute(name)
+      _req.session.removeAttribute(name)
+      result
+   }
+
    def forward(location:String) = {
       req.getRequestDispatcher(location).forward(req, res)
       <forward />
