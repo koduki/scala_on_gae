@@ -1,0 +1,192 @@
+@charset "UTF-8";
+
+header, nav, article, footer {
+	display: block;
+   background:#333333;
+} 
+
+ul li {
+   list-style:none outside none;
+}
+
+body {
+   background: url("http://blognandayomon.appspot.com/images/background.png") repeat scroll left top transparent;
+   margin:0px;
+   padding:0px;
+}
+
+header.global {
+   background:url("http://blognandayomon.appspot.com/images/wrapper-background.png") repeat-x scroll left top transparent;
+   height:130px;
+}
+
+header.global h1{
+   color:#ffffff;
+   padding:26px 20px;
+	margin: 0px;
+	font-size: 24px;
+}
+header.global nav ul li{
+   float:left;
+   padding:0px 15px 0px;
+}
+header.global nav ul li a{
+   -moz-border-radius:5px 5px 5px 5px;
+   background:url("http://blognandayomon.appspot.com/images/pagenav.png") repeat-x scroll left top transparent;
+   color:#ffffff;
+   display:block;
+   font-size:12px;
+   font-weight:bold;
+   margin-left:-10px;
+   padding:8px 20px;
+   text-decoration:none;
+   text-shadow:0 1px 0 #252424;
+   text-transform:uppercase;
+}
+
+
+header.global form {
+   text-align:right;
+   margin-right:5px;
+}
+header.global form fieldset {
+   background:none repeat scroll 0 0 transparent;
+   border:medium none;
+   margin:0;
+   padding:0;
+}
+header.global form fieldset legend {
+   display:none;
+}
+input, textarea {
+   border:1px solid #DADADA;
+}
+
+footer.global {
+	clear: both;
+   color: #ffffff;
+   text-align:center;
+   padding: 10px;
+}
+footer.global p{
+   padding: 0px;
+   margin: 0px;
+}
+
+nav.pager{
+   background:none repeat scroll 0 0 transparent;
+   color:#D7D7D7;
+}
+nav.pager a {
+   text-decoration:none;
+   color:#D7D7D7;
+}
+
+#body {
+	width: 950px;
+   margin:0 auto;
+}
+
+#content {
+	float: left;
+	width: 690px;
+	margin:0 0 10px 0;
+}
+
+#content article {
+	margin: 10px;
+}
+#content article header {
+	color: #ffffff;
+   text-align:right;
+   padding:10px 10px 0 10px;
+   margin:0px 0px 0px 0px;
+}
+#content article header h2 {
+	font-size: 18px;
+   text-align:left;
+   padding:0;
+   margin:0;
+}
+#content article header a{
+   color: #ffffff;
+   text-decoration:none;
+}
+#content article header p {
+   padding:0;
+   margin:0;
+}
+#content article .body div {
+   padding:5px;
+   margin:5px;
+   background: #b4b4b4;
+}
+
+#content .comments {
+   color: #ffffff;
+}
+#content .comments p {
+   display: inline;
+}
+#content .comments form fieldset {
+   background:none repeat scroll 0 0 transparent;
+   border:medium none;
+   margin:0;
+   padding:0;
+}
+#content .comments form input.name {
+   width:80px;
+	background: #b4b4b4;
+}
+#content .comments form input.comment {
+   width:280px;
+	background: #b4b4b4;
+}
+
+
+
+#content footer {
+   padding:5px;
+   margin:5px;
+}
+
+aside#sidebar {
+   color:#D7D7D7;
+   font-size:13px;
+	float: right;
+   width:210px;
+}
+aside#sidebar div {
+   background:#333333;
+} 
+aside#sidebar p {
+   padding:5px;
+} 
+
+
+
+
+aside#sidebar h2 {
+        background:url("http://blognandayomon.appspot.com/images/sidebar-tab.png") repeat-x scroll left bottom transparent;
+        color:#ffffff;
+        font-size:16px;
+        font-weight:bold;
+        margin:10px 0px 0px 0;
+        padding:10px 0px 10px 10px;
+        text-shadow:0 1px 0 #322F30;
+        text-transform:uppercase;
+
+        width:200px;
+}
+
+aside#sidebar ul li {
+        border-bottom:1px solid #454243;
+        margin:0;
+        padding:4px 0 6px 18px;
+        color:#ffffff;
+}
+
+aside#sidebar a {
+        color:#D7D7D7;
+        text-decoration:none;
+}

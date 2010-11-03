@@ -30,6 +30,20 @@ object Application extends AbstractApplication{
 
       Show(id, entry, comments)
    }
+　
+   get("/edit.html"){env =>
+      Template("edit"){$
+          <form method="post" action="/create.do">$
+            <fieldset>$
+               <legend>ここに入力</legend>$
+               <p>{$("<input name='title' value='" +  entry('title) + "' />")}</p>$
+               <div>内容:</div>$
+               <textarea class="ckeditor" name="contents">{entry('contents)}</textarea>$
+            </fieldset>$
+            <input type="submit" value="書き込む"/>$
+         </form>$
+      }$
+   }
 
    get("/muse/pascal/edit.html"){env =>
       import env._
